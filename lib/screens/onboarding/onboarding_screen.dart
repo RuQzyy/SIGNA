@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bahasaku/screens/home/home_screen.dart';
+import 'package:liquid_swipe/liquid_swipe.dart';
 import 'onboarding_page.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -10,69 +11,69 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  final PageController _controller = PageController();
   int _currentPage = 0;
 
-  void _nextPage() {
-    if (_currentPage < 2) {
-      _controller.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    }
+  void _onPageChangeCallback(int activePageIndex) {
+    setState(() {
+      _currentPage = activePageIndex;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
 
+    final pages = [
+      OnboardingPage(
+        image: "assets/images/1.jpg",
+        title: "Selamat Datang",
+        description:
+            "Aplikasi penerjemah bahasa isyarat menjadi suara secara real-time",
+        button: _nextButton(),
+      ),
+      OnboardingPage(
+        image: "assets/images/1.jpg",
+        title: "Terjemahkan Gerakan",
+        description:
+            "Arahkan kamera dan biarkan aplikasi menerjemahkan bahasa isyarat Anda",
+        button: _nextButton(),
+      ),
+      OnboardingPage(
+        image: "assets/images/1.jpg",
+        title: "Belajar Bahasa Isyarat",
+        description:
+            "Pelajari bahasa isyarat melalui video dan animasi interaktif",
+        button: _startButton(),
+      ),
+    ];
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // ================= PAGE VIEW =================
-          PageView(
-            controller: _controller,
-            onPageChanged: (index) {
-              setState(() => _currentPage = index);
-            },
-            children: [
-              OnboardingPage(
-                image: "assets/images/1.jpg",
-                title: "Selamat Datang",
-                description:
-                    "Aplikasi penerjemah bahasa isyarat menjadi suara secara real-time",
-                button: _nextButton(),
-              ),
-              OnboardingPage(
-                image: "assets/images/1.jpg",
-                title: "Terjemahkan Gerakan",
-                description:
-                    "Arahkan kamera dan biarkan aplikasi menerjemahkan bahasa isyarat Anda",
-                button: _nextButton(),
-              ),
-              OnboardingPage(
-                image: "assets/images/1.jpg",
-                title: "Belajar Bahasa Isyarat",
-                description:
-                    "Pelajari bahasa isyarat melalui video dan animasi interaktif",
-                button: _startButton(),
-              ),
-            ],
+          // ================= LIQUID SWIPE =================
+          LiquidSwipe(
+            pages: pages,
+            onPageChangeCallback: _onPageChangeCallback,
+            waveType: WaveType.circularReveal, // 🔥 liquid asli
+            fullTransitionValue: 880,
+            slideIconWidget: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+            ),
+            enableLoop: false,
+            positionSlideIcon: 0.5,
           ),
 
-          // ================= LOGO (TENGAH) =================
+          // ================= LOGO (IKUT SWIPE) =================
           Positioned(
             top: height * 0.20,
             left: 0,
             right: 0,
-            child: Center(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
               child: Column(
+                key: ValueKey(_currentPage),
                 children: [
                   ClipOval(
                     child: Container(
@@ -134,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           width: isActive ? 16 : 8,
           height: 8,
           decoration: BoxDecoration(
-            color: isActive ? const Color.fromARGB(255, 0, 0, 0) : Color.fromARGB(137, 64, 53, 212),
+            color: isActive ? Colors.black : Color.fromARGB(137, 101, 70, 212),
             borderRadius: BorderRadius.circular(4),
           ),
         );
@@ -144,33 +145,37 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   // ================= BUTTONS =================
   Widget _nextButton() {
-  return ElevatedButton(
-    onPressed: _nextPage,
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.black, 
-      foregroundColor: Colors.white, 
-      minimumSize: const Size(double.infinity, 50),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
+    return ElevatedButton(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
       ),
-    ),
-    child: const Text("Next"),
-  );
-}
+      child: const Text("Next"),
+    );
+  }
 
-Widget _startButton() {
-  return ElevatedButton(
-    onPressed: _nextPage,
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.black,
-      foregroundColor: Colors.white,
-      minimumSize: const Size(double.infinity, 50),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
+  Widget _startButton() {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
       ),
-    ),
-    child: const Text("Mulai Aplikasi"),
-  );
-}
-
+      child: const Text("Mulai Aplikasi"),
+    );
+  }
 }
