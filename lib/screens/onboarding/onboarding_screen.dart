@@ -11,12 +11,27 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
+  final LiquidController _liquidController = LiquidController();
   int _currentPage = 0;
 
-  void _onPageChangeCallback(int activePageIndex) {
+  void _onPageChangeCallback(int index) {
     setState(() {
-      _currentPage = activePageIndex;
+      _currentPage = index;
     });
+  }
+
+  void _nextPage() {
+    if (_currentPage < 2) {
+      _liquidController.animateToPage(
+        page: _currentPage + 1,
+        duration: 500,
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    }
   }
 
   @override
@@ -32,7 +47,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         button: _nextButton(),
       ),
       OnboardingPage(
-        image: "assets/images/1.jpg",
+        image: "assets/images/2.jpg",
         title: "Terjemahkan Gerakan",
         description:
             "Arahkan kamera dan biarkan aplikasi menerjemahkan bahasa isyarat Anda",
@@ -51,18 +66,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // ================= LIQUID SWIPE =================
-          LiquidSwipe(
-            pages: pages,
-            onPageChangeCallback: _onPageChangeCallback,
-            waveType: WaveType.circularReveal, // 🔥 liquid asli
-            fullTransitionValue: 880,
-            slideIconWidget: const Icon(
-              Icons.arrow_back_ios,
-              color: Colors.white,
+          // ================= LIQUID SWIPE (ANTI BOCOR) =================
+          ClipRect( // 🔥 WAJIB
+            child: LiquidSwipe(
+              pages: pages,
+              liquidController: _liquidController,
+              onPageChangeCallback: _onPageChangeCallback,
+              waveType: WaveType.liquidReveal,
+              fullTransitionValue: 1200, // 🔥 PERBESAR BIAR 0 PEEK
+              enableLoop: false,
+              enableSideReveal: false,
+              ignoreUserGestureWhileAnimating: true,
+              slideIconWidget: const SizedBox(), // 🔥 HILANGKAN AREA KANAN
             ),
-            enableLoop: false,
-            positionSlideIcon: 0.5,
           ),
 
           // ================= LOGO (IKUT SWIPE) =================
@@ -135,7 +151,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           width: isActive ? 16 : 8,
           height: 8,
           decoration: BoxDecoration(
-            color: isActive ? Colors.black : Color.fromARGB(137, 101, 70, 212),
+            color: isActive ? Colors.black : Color.fromARGB(137, 58, 56, 158),
             borderRadius: BorderRadius.circular(4),
           ),
         );
@@ -146,7 +162,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // ================= BUTTONS =================
   Widget _nextButton() {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: _nextPage,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
@@ -155,27 +171,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           borderRadius: BorderRadius.circular(30),
         ),
       ),
-      child: const Text("Next"),
+      child: const Text("Swipe"),
     );
   }
 
   Widget _startButton() {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
+    return Material(
+      color: Colors.black,
+      borderRadius: BorderRadius.circular(30),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(30),
+        onTap: _nextPage,
+        child: const SizedBox(
+          height: 50,
+          width: double.infinity,
+          child: Center(
+            child: Text(
+              "Mulai Aplikasi",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ),
       ),
-      child: const Text("Mulai Aplikasi"),
     );
   }
 }
