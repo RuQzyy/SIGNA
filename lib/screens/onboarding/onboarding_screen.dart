@@ -54,7 +54,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         button: _nextButton(),
       ),
       OnboardingPage(
-        image: "assets/images/1.jpg",
+        image: "assets/images/3.jpg",
         title: "Belajar Bahasa Isyarat",
         description:
             "Pelajari bahasa isyarat melalui video dan animasi interaktif",
@@ -66,18 +66,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // ================= LIQUID SWIPE (ANTI BOCOR) =================
-          ClipRect( // 🔥 WAJIB
+          // ================= LIQUID SWIPE  =================
+          ClipRect( 
             child: LiquidSwipe(
               pages: pages,
               liquidController: _liquidController,
               onPageChangeCallback: _onPageChangeCallback,
               waveType: WaveType.liquidReveal,
-              fullTransitionValue: 1200, // 🔥 PERBESAR BIAR 0 PEEK
+              fullTransitionValue: 1200, 
               enableLoop: false,
               enableSideReveal: false,
               ignoreUserGestureWhileAnimating: true,
-              slideIconWidget: const SizedBox(), // 🔥 HILANGKAN AREA KANAN
+              slideIconWidget: const SizedBox(), 
             ),
           ),
 
