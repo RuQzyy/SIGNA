@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:bahasaku/screens/home/home_screen.dart';
 import 'package:liquid_swipe/liquid_swipe.dart';
+import 'package:bahasaku/layouts/navbar.dart';
 import 'onboarding_page.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -27,9 +27,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         duration: 500,
       );
     } else {
+      // 👉 MASUK KE LAYOUT UTAMA (NAVBAR)
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(
+          builder: (_) => const NavbarLayout(),
+        ),
       );
     }
   }
@@ -43,7 +46,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         image: "assets/images/1.jpg",
         title: "Selamat Datang",
         description:
-            "Aplikasi penerjemah bahasa isyarat menjadi suara secara real-time",
+            "Aplikasi pelatihan dan penerjemahan bahasa isyarat secara real-time",
         button: _nextButton(),
       ),
       OnboardingPage(
@@ -57,7 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         image: "assets/images/3.jpg",
         title: "Belajar Bahasa Isyarat",
         description:
-            "Pelajari bahasa isyarat melalui video dan animasi interaktif",
+            "Pelajari bahasa isyarat melalui materi interaktif dan latihan",
         button: _startButton(),
       ),
     ];
@@ -66,22 +69,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // ================= LIQUID SWIPE  =================
-          ClipRect( 
+          ClipRect(
             child: LiquidSwipe(
               pages: pages,
               liquidController: _liquidController,
               onPageChangeCallback: _onPageChangeCallback,
               waveType: WaveType.liquidReveal,
-              fullTransitionValue: 1200, 
+              fullTransitionValue: 1200,
               enableLoop: false,
               enableSideReveal: false,
               ignoreUserGestureWhileAnimating: true,
-              slideIconWidget: const SizedBox(), 
+              slideIconWidget: const SizedBox(),
             ),
           ),
 
-          // ================= LOGO (IKUT SWIPE) =================
+          // ================= LOGO =================
           Positioned(
             top: height * 0.20,
             left: 0,
@@ -151,7 +153,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           width: isActive ? 16 : 8,
           height: 8,
           decoration: BoxDecoration(
-            color: isActive ? Colors.black : Color.fromARGB(137, 58, 56, 158),
+            color: isActive
+                ? Colors.black
+                : const Color.fromARGB(137, 58, 56, 158),
             borderRadius: BorderRadius.circular(4),
           ),
         );
