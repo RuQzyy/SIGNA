@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:liquid_swipe/liquid_swipe.dart';
 import 'package:bahasaku/layouts/navbar.dart';
@@ -13,26 +14,32 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final LiquidController _liquidController = LiquidController();
   int _currentPage = 0;
+  bool _isAnimating = false;
 
   void _onPageChangeCallback(int index) {
     setState(() {
       _currentPage = index;
+      _isAnimating = false;
     });
   }
 
+  // ================= BUTTON SWIPE (DIPERLAMBAT MANUAL)
   void _nextPage() {
+    if (_isAnimating) return;
+    _isAnimating = true;
+
     if (_currentPage < 2) {
-      _liquidController.animateToPage(
-        page: _currentPage + 1,
-        duration: 500,
-      );
+      // 🔥 delay kecil agar terasa smooth
+      Timer(const Duration(milliseconds: 80), () {
+        _liquidController.animateToPage(
+          page: _currentPage + 1,
+          duration: 900, // 🔥 lebih lambat
+        );
+      });
     } else {
-      // 👉 MASUK KE LAYOUT UTAMA (NAVBAR)
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const NavbarLayout(),
-        ),
+        MaterialPageRoute(builder: (_) => const NavbarLayout()),
       );
     }
   }
@@ -69,27 +76,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          ClipRect(
-            child: LiquidSwipe(
-              pages: pages,
-              liquidController: _liquidController,
-              onPageChangeCallback: _onPageChangeCallback,
-              waveType: WaveType.liquidReveal,
-              fullTransitionValue: 1200,
-              enableLoop: false,
-              enableSideReveal: false,
-              ignoreUserGestureWhileAnimating: true,
-              slideIconWidget: const SizedBox(),
-            ),
+          LiquidSwipe(
+            pages: pages,
+            liquidController: _liquidController,
+            onPageChangeCallback: _onPageChangeCallback,
+            waveType: WaveType.liquidReveal,
+            fullTransitionValue: 1200,
+            enableSideReveal: true, 
+            enableLoop: false,
+            ignoreUserGestureWhileAnimating: false,
+            slideIconWidget: const SizedBox(),
           ),
 
-          // ================= LOGO =================
+          // ================= LOGO
           Positioned(
             top: height * 0.20,
             left: 0,
             right: 0,
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 400),
+              duration: const Duration(milliseconds: 500),
               child: Column(
                 key: ValueKey(_currentPage),
                 children: [
@@ -128,7 +133,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
 
-          // ================= DOT INDICATOR =================
+          // ================= DOTS
           Positioned(
             bottom: 120,
             left: 0,
@@ -140,7 +145,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // ================= DOTS =================
+  // ================= DOT INDICATOR
   Widget _buildDots() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -148,14 +153,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         final isActive = _currentPage == index;
 
         return AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 350),
           margin: const EdgeInsets.symmetric(horizontal: 6),
-          width: isActive ? 16 : 8,
+          width: isActive ? 18 : 8,
           height: 8,
           decoration: BoxDecoration(
-            color: isActive
-                ? Colors.black
-                : const Color.fromARGB(137, 58, 56, 158),
+            color: isActive ? Colors.black : Colors.black38,
             borderRadius: BorderRadius.circular(4),
           ),
         );
@@ -163,7 +166,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // ================= BUTTONS =================
+  // ================= BUTTONS
   Widget _nextButton() {
     return ElevatedButton(
       onPressed: _nextPage,
